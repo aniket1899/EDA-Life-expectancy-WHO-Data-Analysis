@@ -1,0 +1,174 @@
+---
+title: "fp2"
+author: "Ruchik Rohit Dama"
+date: "12/8/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+life_00=life[which(life$Year==2000),]
+life_14=life[which(life$Year==2014),]
+```
+
+
+```{r}
+model.lm.00 = lm(Life_expectancy ~ Polio + Total_expenditure+Schooling+continent + continent:Total_expenditure + continent:Schooling, data=life_00)
+# summary((model.lm))
+library(broom)
+model.lm.aug.00 = augment(model.lm.00)
+ggplot(model.lm.aug.00, 
+       aes(x=Polio, y=.resid)
+       )+
+  geom_point(color="grey")+
+  geom_smooth(method = "lm",color="dark blue",se=FALSE)+
+  facet_wrap(~continent)+ylab("Residual Values")+xlab("Polio ")+ggtitle("Polio v/s Residual values for 2000") +theme_bw()+ theme(plot.title = element_text(size = 10, face = "bold", hjust = 0.5))
+
+```
+
+```{r}
+ggplot(model.lm.aug.00, 
+       aes(x=Total_expenditure, y=.resid)
+       )+
+  geom_point(color="grey")+
+  geom_smooth(method = "lm",color="dark blue",se=FALSE)+
+  facet_wrap(~continent)+ylab("Residual Values")+xlab("Total Expenditure ")+ggtitle("Total Expenditure  v/s Residual values for 2000") +theme_bw()+ theme(plot.title = element_text(size = 10, face = "bold", hjust = 0.5))
+```
+
+```{r}
+ggplot(model.lm.aug.00, 
+       aes(x=Schooling, y=.resid)
+       )+
+  geom_point(color="grey")+
+  geom_smooth(method = "lm",color="dark blue",se=FALSE)+
+  facet_wrap(~continent)+ylab("Residual Values")+xlab("Schooling ")+ggtitle("Schooling  v/s Residual values for 2000") +theme_bw()+ theme(plot.title = element_text(size = 10, face = "bold", hjust = 0.5))
+```
+
+
+```{r}
+summary((model.lm.00))
+```
+
+
+
+```{r}
+model.lm.14 = lm(Life_expectancy ~ Polio +Diphtheria+ Total_expenditure+Schooling+continent + continent:Total_expenditure + continent:Schooling, data=life_14)
+# summary((model.lm))
+library(broom)
+model.lm.aug.14 = augment(model.lm.14)
+ggplot(model.lm.aug.14, 
+       aes(x=Polio, y=.resid)
+       )+
+  geom_point(color="grey")+
+  geom_smooth(method = "lm",color="dark blue",se=FALSE)+
+  facet_wrap(~continent)+ylab("Residual Values")+xlab("Polio ")+ggtitle("Polio v/s Residual values for 2014") +theme_bw()+ theme(plot.title = element_text(size = 10, face = "bold", hjust = 0.5))
+
+```
+
+
+```{r}
+ggplot(model.lm.aug.14, 
+       aes(x=Total_expenditure, y=.resid)
+       )+
+  geom_point(color="grey")+
+  geom_smooth(method = "lm",color="dark blue",se=FALSE)+
+  facet_wrap(~continent)+ylab("Residual Values")+xlab("Total Expenditure ")+ggtitle("Total Expenditure  v/s Residual values for 2014") +theme_bw()+ theme(plot.title = element_text(size = 10, face = "bold", hjust = 0.5))
+```
+
+```{r}
+ggplot(model.lm.aug.14, 
+       aes(x=Schooling, y=.resid)
+       )+
+  geom_point(color="grey")+
+  geom_smooth(method = "lm",color="dark blue",se=FALSE)+
+  facet_wrap(~continent)+ylab("Residual Values")+xlab("Schooling ")+ggtitle("Schooling  v/s Residual values for 2014") +theme_bw()+ theme(plot.title = element_text(size = 10, face = "bold", hjust = 0.5))
+```
+
+
+
+
+
+
+
+```{r}
+life_00.grid=expand.grid(Polio=seq(min(life_00$Polio),max(life_00$Polio),1),Total_expenditure=seq(min(life_00$Total_expenditure),max(life_00$Total_expenditure),0.25),Schooling=seq(min(life_00$Schooling),max(life_00$Schooling),1),continent=c("Asia","Europe","Africa","North America","South America","Oceania"),Status=c("Developed","Developing"))
+
+life_00.model=lm(Life_expectancy ~ Polio +Status+ Total_expenditure+Schooling+continent + continent:Total_expenditure + continent:Schooling, data=life_00)
+
+life_00.pred = predict(life_00.model,
+type = "response", newdata = life_00.grid)
+life_00.pred.df = data.frame(life_00.grid,
+life_00.prob = as.vector(life_00.pred))
+
+
+```
+```{r}
+
+library("gridExtra")
+gp0_legend=ggplot( life_00.pred.df,aes(x = Polio, y = life_00.prob,color=continent,group=continent))+geom_smooth(method='lm',se=FALSE)+theme(axis.text.x = element_text(angle = 50, hjust = .9, vjust = .9))+ylab("Predicted Life Expectancy")+xlab("Polio ")+ggtitle("Polio v/s Predicted Life Expectancy for 2000") + theme(plot.title = element_text(size = 10, face = "bold", hjust = 0.5),legend.position = "bottom")
+
+gp0=ggplot( life_00.pred.df,aes(x = Polio, y = life_00.prob,color=continent,group=continent))+geom_smooth(method='lm',se=FALSE)+theme(axis.text.x = element_text(angle = 50, hjust = .9, vjust = .9))+ylab("Predicted Life Expectancy")+xlab("Polio ")+ggtitle("Polio v/s Predicted Life Expectancy for 2000") +theme_bw()+ theme(plot.title = element_text(size = 10, face = "bold", hjust = 0.5),legend.position = "hidden")
+
+gte0=ggplot( life_00.pred.df,aes(x = Total_expenditure, y = life_00.prob,color=continent,group=continent))+geom_smooth(method='lm',se=FALSE)+theme(axis.text.x = element_text(angle = 50, hjust = .9, vjust = .9))+ylab("Predicted Life Expectancy")+xlab("Total Expenditure ")+ggtitle("Total Expenditur v/s Predicted Life Expectancy for 2000")+theme_bw() + theme(plot.title = element_text(size = 10, face = "bold", hjust = 0.5),legend.position = "hidden")
+
+gs0=ggplot( life_00.pred.df,aes(x = Schooling, y = life_00.prob,color=continent,group=continent))+geom_smooth(method='lm',se=FALSE)+theme(axis.text.x = element_text(angle = 50, hjust = .9, vjust = .9))+ylab("Predicted Life Expectancy")+xlab("Schooling ")+ggtitle("Schooling v/s Predicted Life Expectancy for 2000")+theme_bw() + theme(plot.title = element_text(size = 10, face = "bold", hjust = 0.5),legend.position = "hidden")
+```
+
+
+```{r}
+life_14.grid=expand.grid(Polio=seq(min(life_14$Polio),max(life_14$Polio),1),Total_expenditure=seq(min(life_14$Total_expenditure),max(life_14$Total_expenditure),0.25),Schooling=seq(min(life_14$Schooling),max(life_14$Schooling),1),continent=c("Asia","Europe","Africa","North America","South America","Oceania"),Status=c("Developed","Developing"))
+
+life_14.model=lm(Life_expectancy ~ Polio +Status+ Total_expenditure+Schooling+continent + continent:Total_expenditure + continent:Schooling, data=life_14)
+
+life_14.pred = predict(life_14.model,
+type = "response", newdata = life_14.grid)
+life_14.pred.df = data.frame(life_14.grid,
+life_14.prob = as.vector(life_14.pred))
+
+```
+
+```{r}
+gp4=ggplot( life_14.pred.df,aes(x = Polio, y = life_14.prob,color=continent,group=continent))+geom_smooth(method='lm',se=FALSE)+theme(axis.text.x = element_text(angle = 50, hjust = .9, vjust = .9))+ylab("Predicted Life Expectancy")+xlab("Polio ")+ggtitle("Polio v/s Predicted Life Expectancy for 2014") +theme_bw()+ theme(plot.title = element_text(size = 10, face = "bold", hjust = 0.5),legend.position = "hidden")
+
+gte4=ggplot( life_14.pred.df,aes(x = Total_expenditure, y = life_14.prob,color=continent,group=continent))+geom_smooth(method='lm',se=FALSE)+theme(axis.text.x = element_text(angle = 50, hjust = .9, vjust = .9))+ylab("Predicted Life Expectancy")+xlab("Total Expenditure ")+ggtitle("Total Expenditure v/s Predicted Life Expectancy for 2014")+theme_bw() + theme(plot.title = element_text(size = 10, face = "bold", hjust = 0.5),legend.position = "hidden")
+
+gs4=ggplot( life_14.pred.df,aes(x = Schooling, y = life_14.prob,color=continent,group=continent))+geom_smooth(method='lm',se=FALSE)+theme(axis.text.x = element_text(angle = 50, hjust = .9, vjust = .9))+ylab("Predicted Life Expectancy")+xlab("Schooling ")+ggtitle("Schooling v/s Predicted Life Expectancy for 2014")+theme_bw() + theme(plot.title = element_text(size = 10, face = "bold", hjust = 0.5),legend.position = "hidden")
+```
+```{r}
+gte4
+```
+```{r}
+extract_legend <- function(my_ggp) {
+  step1 <- ggplot_gtable(ggplot_build(my_ggp))
+  step2 <- which(sapply(step1$grobs, function(x) x$name) == "guide-box")
+  step3 <- step1$grobs[[step2]]
+  return(step3)
+}
+shared_legend <- extract_legend(gp0_legend)
+```
+
+
+```{r,fig.height=5,fig.width=10}
+
+grid.arrange(arrangeGrob(gp0, gp4, ncol = 2),
+             shared_legend, nrow = 2, heights = c(10, 1))
+```
+```{r,fig.height=5,fig.width=10}
+
+grid.arrange(arrangeGrob(gte0, gte4, ncol = 2),
+             shared_legend, nrow = 2, heights = c(10, 1))
+```
+
+```{r,fig.height=5,fig.width=10}
+
+grid.arrange(arrangeGrob(gs0, gs4, ncol = 2),
+             shared_legend, nrow = 2, heights = c(10, 1))
+```
+
+
+
+
+
