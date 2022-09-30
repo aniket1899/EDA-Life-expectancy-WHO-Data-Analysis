@@ -1,2 +1,6 @@
-# EDA-Life-expectancy-WHO-Data-Analysis
-Data Analysis of Life expectancy with WHO data-set. EDA Final Project
+# Exploratory Data Analysis Final Project | Fall 2021
+
+
+## Description: 
+Data Analysis of Life expectancy with multiple WHO data-sets.
+
