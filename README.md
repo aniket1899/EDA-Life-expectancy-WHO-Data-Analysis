@@ -1,4 +1,4 @@
-<div align="center"># Exploratory Data Analysis Final Project | Fall 2021</div>
+# <div align="center">Exploratory Data Analysis Final Project | Fall 2021</div>
 
 ---
 
